@@ -21,11 +21,13 @@ func Buy(b Book) (Book, error) {
 	return b, nil
 }
 
-func GetAllBooks(catalog []Book) []Book {
+func GetAllBooks(catalog map[int]Book) map[int]Book {
 	return catalog
 }
 
-func GetBook(catalog map[int]Book, id int) Book {
-	fmt.Println(catalog[id].Title)
-	return catalog[id]
+func GetBook(catalog map[int]Book, id int) (Book, error) {
+	if _, ok := catalog[id]; !ok {
+		return Book{}, fmt.Errorf("ID %d doesn't exist", id)
+	}
+	return catalog[id], nil
 }
