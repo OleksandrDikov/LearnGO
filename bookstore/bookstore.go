@@ -6,10 +6,12 @@ import (
 )
 
 type Book struct {
-	Title  string
-	Author string
-	Copies int
-	ID     int
+	Title           string
+	Author          string
+	Copies          int
+	ID              int
+	PriceCents      int
+	DiscountPercent int
 }
 
 func Buy(b Book) (Book, error) {
@@ -30,4 +32,9 @@ func GetBook(catalog map[int]Book, id int) (Book, error) {
 		return Book{}, fmt.Errorf("ID %d doesn't exist", id)
 	}
 	return catalog[id], nil
+}
+
+func NetPriceCents(catalog map[int]Book, id int) float64 {
+	netPrice := float64(catalog[id].PriceCents) * (1 - float64(catalog[id].DiscountPercent)/100)
+	return netPrice
 }
