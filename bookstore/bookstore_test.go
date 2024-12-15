@@ -2,7 +2,6 @@ package bookstore_test
 
 import (
 	"bookstore"
-	"math"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -89,17 +88,15 @@ func TestGetBookBadIDReturnsError(t *testing.T) {
 
 func TestNetPriceCents(t *testing.T) {
 	t.Parallel()
-	catalog := map[int]bookstore.Book{
-		1: {ID: 1, Title: "For the Love of Go", PriceCents: 90, DiscountPercent: 10},
-		2: {ID: 2, Title: "The Power of Go: Tools", PriceCents: 99, DiscountPercent: 10},
+	b := bookstore.Book{
+		ID:              2,
+		Title:           "The Power of Go: Tools",
+		PriceCents:      4000,
+		DiscountPercent: 25,
 	}
-	want := float64(89)
-	got := bookstore.NetPriceCents(catalog, 2)
-	if !closeEnough(want, got, 0.2) {
-		t.Errorf("want: %v, got: %v", want, got)
+	want := 3000
+	got := b.NetPriceCents()
+	if want != got {
+		t.Errorf("want %d, got %d", want, got)
 	}
-}
-
-func closeEnough(a, b, tolerance float64) bool {
-	return math.Abs(a-b) <= tolerance
 }

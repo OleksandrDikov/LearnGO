@@ -34,7 +34,7 @@ func GetBook(catalog map[int]Book, id int) (Book, error) {
 	return catalog[id], nil
 }
 
-func NetPriceCents(catalog map[int]Book, id int) float64 {
-	netPrice := float64(catalog[id].PriceCents) * (1 - float64(catalog[id].DiscountPercent)/100)
-	return netPrice
+func (b Book) NetPriceCents() int {
+	saving := b.PriceCents * b.DiscountPercent / 100
+	return b.PriceCents - saving
 }
