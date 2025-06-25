@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func getTestCatalog() map[string]books.Book {
-	return map[string]books.Book{
+func getTestCatalog() books.Catalog {
+	return books.Catalog{
 		"1": {
 			Title:  "In the Company of Cheerful Ladies",
 			Author: "Alexander McCall Smith",
@@ -32,7 +32,7 @@ func TestBookToString_FormatsBookInfoAsString(t *testing.T) {
 		Copies: 2,
 	}
 	want := "Sea Room by Adam Nicolson (copies: 2)"
-	got := books.BookToString(input)
+	got := input.String()
 	if want != got {
 		t.Fatalf("want %q, got %q", want, got)
 	}
@@ -56,7 +56,7 @@ func TestGetAllBooks_ReturnsAllBooks(t *testing.T) {
 		},
 	}
 
-	got := books.GetAllBooks(catalog)
+	got := catalog.GetAllBooks()
 	slices.SortFunc(got, func(a, b books.Book) int {
 		return cmp.Compare(a.Author, b.Author)
 	})
@@ -75,7 +75,7 @@ func TestGetBook_FindsBookInCatalogByID(t *testing.T) {
 		Author: "Alexander McCall Smith",
 		Copies: 1,
 	}
-	got, ok := books.GetBook(catalog, "1")
+	got, ok := catalog.GetBook("1")
 	if !ok {
 		t.Fatalf("Book not found.")
 	}
@@ -87,7 +87,7 @@ func TestGetBook_FindsBookInCatalogByID(t *testing.T) {
 func TestGetBook_ReturnsFalseWhenBookNotFound(t *testing.T) {
 	t.Parallel()
 	catalog := getTestCatalog()
-	_, ok := books.GetBook(catalog, "nonexistent ID")
+	_, ok := catalog.GetBook("nonexistent ID")
 	if ok {
 		t.Fatal("want false for nonexistent ID, got true")
 	}
@@ -102,13 +102,36 @@ func TestAddBook_AddsBookToCatalog(t *testing.T) {
 		Author: "Glyn Williams",
 		Copies: 2,
 	}
-	_, ok := books.GetBook(catalog, want.ID)
+	_, ok := catalog.GetBook(want.ID)
 	if ok {
 		t.Fatalf("Book already exists.")
 	}
 
-	ok = books.AddBook(catalog, want)
+	ok = catalog.AddBook(want)
 	if !ok {
 		t.Fatalf("Error adding book.")
+	}
+}
+
+func TestSetCopies_SetsNumberOfCopiesToGivenValue(t *testing.T) {
+	t.Parallel()
+	book := books.Book{
+		Copies: 5,
+	}
+	err := book.SetCopies(12)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if book.Copies != 12 {
+		t.Errorf("want 12 copies, got %d", book.Copies)
+	}
+}
+
+func TestSetCopies_ReturnsErrorIfCopiesNegative(t *testing.T) {
+	t.Parallel()
+	book := books.Book{}
+	err := book.SetCopies(-1)
+	if err == nil {
+		t.Error("want error for negative copies, got nil")
 	}
 }
